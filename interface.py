@@ -10,9 +10,9 @@ st.set_page_config(layout="wide", page_title="ECG Rhythm Classifier")
 def load_model():
     return tf.keras.models.load_model("model/optimized_ecg_model.keras")
 
-NSR_sample = np.load("frontend/NSR_sample.npy")
-AFIB_sample = np.load("frontend/AFIB_sample.npy")
-AVB_sample = np.load("frontend/AVB_sample.npy")
+NSR_sample = np.load("frontend_files/NSR_sample.npy")
+AFIB_sample = np.load("frontend_files/AFIB_sample.npy")
+AVB_sample = np.load("frontend_files/AVB_sample.npy")
 
 model = load_model()
 
@@ -42,8 +42,11 @@ labels = {0: '1st Degree AVB', 1: 'A-Fib', 2: 'Normal Sinus Rhythm'}
 predicted_class = labels[prediction_label]
 
 # Print rhythm classification
-st.metric("Rhythm Classification" ,predicted_class)
-st.metric("Confidence", confidence , format="%.2f%%")
+classcol, confcol = st.columns(2)
+with classcol:
+    st.metric("Rhythm Classification" ,predicted_class)
+with confcol:
+    st.metric("Confidence", confidence , format="%.2f%%")
 
 # Format the sample for display
 sample_for_display = current_sample.tolist()
@@ -52,14 +55,14 @@ sample_for_display = json.dumps(sample_for_display)
 # Start html content for smooth sample scrolling with a confidence bar
 html_content = f""" 
 <html>
-<body style="background:#050508; margin:0; padding:1rem; font-family:'Courier New', monospace;">
-<div style="background:#050508; border:1px solid #ffffff15; border-radius:4px; padding:1rem; max-width:100%; overflow:hidden;">
-    <svg id="ecg" width="100%" viewBox="0 0 800 560" style="display:block; padding:4px;">
+<body style="background:#050508; margin:0; padding:1rem; font-family:'Courier New', monospace; display:flex; justify-content:center;">
+<div style="background:#050508; border:1px solid #ffffff15; border-radius:4px; padding:1rem; width:100%; height:190px; overflow:hidden;">
+    <svg id="ecg" width="100%" viewBox="0 0 800 560" style="display:block; padding:0px;">
     </svg>
 </div>
 <script>
 const svg = document.getElementById('ecg');
-const w = 800, h = 60;
+const w = 800, h = 150;
 
 // Vertical grid lines
 for (let i = 0; i < 20; i++) {{
@@ -97,7 +100,7 @@ function draw() {{
     for (let i = 0; i < windowSize; i++) {{
         const idx = (offset + i) % signal.length;
         const x = (i / windowSize) * w;
-        const y = h/2 - signal[idx][0] * (h/3);
+        const y = h/2 + 5 - signal[idx][0] * (h/20);
         d += (i === 0 ? 'M ' : 'L ') + x + ',' + y + ' ';
     }}
     pathEl.setAttribute('d', d);
@@ -113,26 +116,22 @@ setInterval(draw, 2);
 </html>
 """
 
-st.components.v1.html(html_content, height=220)
+st.components.v1.html(html_content, height=260)
 
 # Create columns and buttons
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button('Normal Sinus Rhythm'):
+    if st.button('Normal Sinus Rhythm sample', use_container_width=True):
         st.session_state.selected_rhythm = "Normal Sinus Rhythm"
         st.rerun()
 
 with col2:
-    if st.button('A-Fib'):
+    if st.button('A-Fib sample', use_container_width=True):
         st.session_state.selected_rhythm = "A-Fib"
         st.rerun()
 
 with col3:
-    if st.button('1st Degree AVB'):
+    if st.button('1st Degree AVB sample', use_container_width=True):
         st.session_state.selected_rhythm = "1st Degree AVB"
         st.rerun()
-
-
-# Debug output
-# st.write(f'Predicted class: {predicted_class} with confidence {confidence:.2f}%')
