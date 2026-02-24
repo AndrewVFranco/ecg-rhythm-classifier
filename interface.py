@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
+import time
 import json
 
 st.set_page_config(layout="wide", page_title="ECG Rhythm Classifier")
@@ -10,9 +11,9 @@ st.set_page_config(layout="wide", page_title="ECG Rhythm Classifier")
 def load_model():
     return tf.keras.models.load_model("model/optimized_ecg_model.keras")
 
-NSR_sample = np.load("frontend_files/NSR_sample.npy")
-AFIB_sample = np.load("frontend_files/AFIB_sample.npy")
-AVB_sample = np.load("frontend_files/AVB_sample.npy")
+NSR_sample = np.load("rhythm_sample/NSR_sample.npy")
+AFIB_sample = np.load("rhythm_sample/AFIB_sample.npy")
+AVB_sample = np.load("rhythm_sample/AVB_sample.npy")
 
 model = load_model()
 
@@ -33,7 +34,18 @@ elif st.session_state.selected_rhythm == '1st Degree AVB':
 
 # Format the sample and make a prediction
 formatted_sample = np.expand_dims(current_sample, axis=0)
+
+# Start the timer
+start_time = time.perf_counter()
+
+# Run your 1-D CNN model inference
 prediction = model.predict(formatted_sample)
+
+# Stop the timer
+end_time = time.perf_counter()
+
+# Calculate the duration in milliseconds
+inference_time_ms = (end_time - start_time) * 1000
 
 # Label the prediction and get the confidence score
 prediction_label = np.argmax(prediction)
@@ -42,17 +54,21 @@ labels = {0: '1st Degree AVB', 1: 'A-Fib', 2: 'Normal Sinus Rhythm'}
 predicted_class = labels[prediction_label]
 
 # Print rhythm classification
-classcol, confcol = st.columns(2)
-with classcol:
+class_col, conf_col, inference_time = st.columns(3)
+with class_col:
     st.metric("Rhythm Classification" ,predicted_class)
-with confcol:
+
+with conf_col:
     st.metric("Confidence", confidence , format="%.2f%%")
+
+with inference_time:
+    st.metric(label="Inference Time", value=f"{inference_time_ms:.2f} ms")
 
 # Format the sample for display
 sample_for_display = current_sample.tolist()
 sample_for_display = json.dumps(sample_for_display)
 
-# Start html content for smooth sample scrolling with a confidence bar
+# Start html content for smooth scrolling sample
 html_content = f""" 
 <html>
 <body style="background:#050508; margin:0; padding:1rem; font-family:'Courier New', monospace; display:flex; justify-content:center;">
@@ -118,7 +134,7 @@ setInterval(draw, 2);
 
 st.components.v1.html(html_content, height=260)
 
-# Create columns and buttons
+# Create columns and buttons for rhythm samples
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -135,3 +151,20 @@ with col3:
     if st.button('1st Degree AVB sample', use_container_width=True):
         st.session_state.selected_rhythm = "1st Degree AVB"
         st.rerun()
+
+# Divider
+st.divider()
+
+# Final metrics section
+st.subheader("Final Accuracy and Macro F1", text_alignment="center")
+st.text("")
+
+# Create columns and badges for model metrics
+_, badge1_col, badge2_col, _ = st.columns([0.32, 0.10, 0.2, 0.2])
+
+with badge1_col:
+    st.badge("Accuracy: 93%")
+
+with badge2_col:
+    st.badge("Macro F1: .81")
+

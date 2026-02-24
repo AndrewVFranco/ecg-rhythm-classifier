@@ -1,4 +1,4 @@
 /model/ptb-xl/
 .idea/
 /model/tuning_results/
-/model/interface_sample_gather.ipynb
+/model/notebooks/interface_sample_gather.ipynb
