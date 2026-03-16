@@ -8,7 +8,7 @@ The model runs entirely on-device — no PHI is ever transmitted to an external 
 
 ---
 
-![Interface_IMG](interface_img.png)
+![Interface_IMG](Interface_img.png)
 
 ## Performance
 
