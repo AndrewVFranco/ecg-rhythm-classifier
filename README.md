@@ -7,6 +7,7 @@ The model runs entirely on-device — no PHI is ever transmitted to an external 
 > This project was developed as a BS Computer Science capstone at Western Governors University (ABET-accredited).
 
 ---
+![Interface_IMG](interface_img.png)
 
 ## Performance
 
@@ -64,9 +65,9 @@ Cross-validation (5-fold) confirmed generalizability: **mean accuracy 90.5% ± 1
 │       ▼                                                     │
 │  Classification + Confidence Score                          │
 │       │                                                     │
-│       ├── Confidence ≥ 80% → Output: NORM / AFIB / 1AVB    │
-│       └── Confidence < 80% → Output: "Unclassified Rhythm" │
-│                             (prompts further clinical review)│
+│       ├── Confidence ≥ 80% → Output: NORM / AFIB / 1AVB     │
+│       └── Confidence < 80% → Output: "Unclassified Rhythm"  │
+│                          (prompts further clinical review)  │
 └─────────────────────────────────────────────────────────────┘
         ↑ All inference on-device. No PHI ever transmitted. ↑
 ```
