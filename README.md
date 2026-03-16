@@ -7,6 +7,7 @@ The model runs entirely on-device — no PHI is ever transmitted to an external 
 > This project was developed as a BS Computer Science capstone at Western Governors University (ABET-accredited).
 
 ---
+
 ![Interface_IMG](interface_img.png)
 
 ## Performance
