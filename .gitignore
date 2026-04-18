@@ -3,3 +3,5 @@
 /model/tuning_results/
 /model/notebooks/interface_sample_gather.ipynb
 /model/final_augmented_dataset.npz
+**.DS_Store
+*.DS_Store
